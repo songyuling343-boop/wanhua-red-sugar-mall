@@ -8,7 +8,7 @@ export default function ExternalActivityTracker(){
     function click(event:MouseEvent){
       const link=(event.target as Element|null)?.closest<HTMLAnchorElement>('a[href]')
       if(!link)return
-      const type=link.href===site.links.quiz?'quiz':link.href===site.links.blindbox?'blindbox':null
+      const type=new URL(link.href).pathname===site.links.quiz?'quiz':new URL(link.href).pathname===site.links.blindbox?'blindbox':null
       if(!type)return
       try{visitActivity(type)}catch(e){event.preventDefault();notify((e as Error).message)}
     }

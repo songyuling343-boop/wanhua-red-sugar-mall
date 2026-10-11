@@ -11,14 +11,14 @@ test('first home visit stays unmarked until a choice; skipping persists across r
   await page.getByRole('button',{name:'先逛逛商城',exact:true}).click()
   expect(await page.evaluate(k=>localStorage.getItem(k),key)).toBe('true')
   await page.reload();await expect(page.getByRole('dialog')).toHaveCount(0)
-  await expect(page.locator('.activity-card.quiz')).toHaveAttribute('target','_blank')
+  await expect(page.locator('.activity-card.quiz')).toHaveAttribute('href','/activity/quiz')
   await page.getByRole('button',{name:'切换到第2张 Banner'}).click()
   await expect(page.locator('.hero-banner')).toContainText('测测你的红糖属性')
   await page.evaluate(()=>localStorage.clear());await page.reload()
   await expect(page.getByRole('dialog')).toBeVisible()
 })
 
-test('immediate test opens a separate page and records the choice',async({page})=>{
+test('immediate test enters the carrier and records the choice',async({page})=>{
   await page.context().route('https://wanhua-red-sugar-quiz.pages.dev/**',route=>route.fulfill({body:'Quiz demo'}))
   await page.goto('/')
   await openActivity(page,page.getByRole('link',{name:'立即测试'}),'https://wanhua-red-sugar-quiz.pages.dev/')

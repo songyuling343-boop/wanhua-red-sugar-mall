@@ -1,10 +1,10 @@
 import { test,expect } from '@playwright/test'
 import { openActivity } from './activity-helpers'
-const quiz='https://wanhua-red-sugar-quiz.pages.dev/',blind='https://wanqiaoqiao-blindbox.pages.dev/'
+const quiz='/activity/quiz',blind='/activity/blindbox'
 
-test('every external activity entry opens a separate page and preserves shop state',async({page})=>{
+test('every activity entry uses a mall carrier and preserves shop state',async({page})=>{
   await page.addInitScript(()=>localStorage.setItem('wanhua-welcome-v1','true'))
-  for(const url of [quiz,blind])await page.context().route(url+'**',r=>r.fulfill({contentType:'text/html',body:'<h1>External activity fixture</h1>'}))
+  for(const url of ['https://wanhua-red-sugar-quiz.pages.dev/','https://wanqiaoqiao-blindbox.pages.dev/'])await page.context().route(url+'**',r=>r.fulfill({contentType:'text/html',body:'<h1>External activity fixture</h1>'}))
   const selector=`a[href="${quiz}"],a[href="${blind}"]`
   let checked=0
   for(const route of ['/','/category','/member','/member/activities','/member/blindbox']){
@@ -16,7 +16,7 @@ test('every external activity entry opens a separate page and preserves shop sta
       await page.getByRole('button',{name:`切换到第${i}张 Banner`}).click();await openActivity(page,page.locator('.hero-link'),i===2?quiz:blind);checked++
       if(i===3){await openActivity(page,page.locator('.quiz-enter-link'),quiz);checked++}
     }
-    await expect(page.getByText('活动将在新页面打开，关闭后可继续回到商城浏览',{exact:true}).first()).toBeVisible()
+    await expect(page.getByText('活动页顶部点击“返回商城”，即可继续浏览',{exact:true}).first()).toBeVisible()
   }
   expect(checked).toBe(12)
   const state=await page.evaluate(()=>JSON.parse(localStorage.getItem('wanhua-member-v1')!))

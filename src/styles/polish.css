@@ -27,3 +27,9 @@ button,a,input,select,textarea{-webkit-tap-highlight-color:transparent}button:no
 .external-activity-note{font-size:10px;line-height:1.8;color:#9b7d5d;text-align:center;margin:10px 0 13px}.welcome-modal .welcome-external-note{display:block;font-size:10px;color:#9b7d5d;line-height:1.8;letter-spacing:0;margin:0 0 13px}
 /* Keep the welcome close control inside the rounded, clipped card edge. */
 .welcome-modal .modal-close{top:44px;right:26px;z-index:1}
+.phone-shell.on-activity{height:100dvh;min-height:0;padding-bottom:0;overflow:hidden}
+.activity-carrier{height:100%;display:flex;flex-direction:column;overflow:hidden}
+.activity-header{flex-shrink:0;height:56px;background:#FFF8ED;border-bottom:1px solid #dfc59e;display:grid;grid-template-columns:100px 1fr 100px;align-items:center;color:#814124;padding:0 10px;z-index:50}
+.activity-header button{display:flex;align-items:center;justify-content:center;gap:4px;height:44px;font-size:13px;white-space:nowrap}
+.activity-header h1{text-align:center;font-size:15px;font-weight:650;margin:0;white-space:nowrap}
+.activity-frame{display:block;flex:1;width:100%;min-height:0;border:0;background:#FFF8ED}

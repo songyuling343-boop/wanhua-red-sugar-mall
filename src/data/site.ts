@@ -2,9 +2,10 @@ export const site = {
   name: '万华巧家小碗红糖',
   subtitle: '云南巧家 · 品牌数字体验馆',
   priceNotice: '价格为策划展示参考，非官方实际售价',
-  activityNotice: '活动将在新页面打开，关闭后可继续回到商城浏览',
+  activityNotice: '活动页顶部点击“返回商城”，即可继续浏览',
   demoNotice: '大学生营销策划比赛 · 交互演示版',
-  links: { quiz: 'https://wanhua-red-sugar-quiz.pages.dev/', blindbox: 'https://wanqiaoqiao-blindbox.pages.dev/' },
+  links: { quiz: '/activity/quiz', blindbox: '/activity/blindbox' },
+  activityUrls: { quiz: 'https://wanhua-red-sugar-quiz.pages.dev/', blindbox: 'https://wanqiaoqiao-blindbox.pages.dev/' },
   assets: {
     logo: '/images/wanhua-official-logo.webp',
     ip: '/images/wan-qiaoqiao-ip-character-sheet.webp',
