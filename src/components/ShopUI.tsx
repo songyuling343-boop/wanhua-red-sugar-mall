@@ -1,5 +1,5 @@
 import { ArrowLeft, ArrowUpRight, ChevronRight, Heart, Home, LayoutGrid, Search, ShoppingBag, UserRound } from 'lucide-react'
-import { Link, NavLink, useNavigate } from 'react-router-dom'
+import { Link, NavLink, useNavigate, useLocation } from 'react-router-dom'
 import type { Product } from '../data/products'
 import { brandById, site } from '../data/site'
 import { useShop } from '../context/ShopContext'
@@ -11,14 +11,15 @@ export function Header({ title, back = false }: { title?: string; back?: boolean
   const navigate = useNavigate(); const { cart } = useShop(); const count = cart.reduce((n,x) => n+x.quantity,0)
   return <header className="shop-header">{back ? <button className="icon-button" aria-label="返回" onClick={() => window.history.state?.idx > 0 ? navigate(-1) : navigate('/category')}><ArrowLeft size={21} /></button> : <Link to="/" className="logo-link"><img src={site.assets.logo} alt="万华官方 Logo" /></Link>}
     <div className="header-copy"><strong>{title || site.name}</strong><span>{title ? 'WANHUA · A LITTLE SWEET' : site.subtitle}</span></div>
-    <Link className="icon-button" to="/category?search=1" aria-label="搜索商品"><Search size={20} /></Link><Link className="icon-button cart-icon" to="/cart" aria-label="购物车"><ShoppingBag size={20} />{count > 0 && <span className="badge">{count > 99 ? '99+' : count}</span>}</Link>
+    <Link className="icon-button" to="/category?search=1" aria-label="搜索商品"><Search size={20} /></Link><Link className="icon-button cart-icon" to="/cart" aria-label="购物车"><ShoppingBag size={20} />{count > 0 && <span className="badge" aria-label={`购物车共${count}件`}>{count > 99 ? '99+' : count}</span>}</Link>
   </header>
 }
 export function BottomNav() {
+  const {pathname}=useLocation()
   const {cart} = useShop(); const count = cart.reduce((n,x)=>n+x.quantity,0)
   return <nav className="bottom-nav" aria-label="底部导航">{[
     { path:'/', label:'首页', icon:Home }, { path:'/category', label:'分类', icon:LayoutGrid }, { path:'/cart', label:'购物车', icon:ShoppingBag }, { path:'/member', label:'会员中心', icon:UserRound },
-  ].map(({ path,label,icon:Icon }) => <NavLink key={path} to={path} end className={({isActive}) => isActive ? 'nav-item active' : 'nav-item'}><span className="relative"><Icon size={21} strokeWidth={1.7}/>{path==='/cart' && count>0 && <i className="nav-dot" />}</span><span>{label}</span></NavLink>)}</nav>
+  ].map(({ path,label,icon:Icon }) => <NavLink key={path} to={path} end className={({isActive}) => (isActive || (path==='/member' && pathname.startsWith('/orders'))) ? 'nav-item active' : 'nav-item'}><span className="relative"><Icon size={21} strokeWidth={1.7}/>{path==='/cart' && count>0 && <span className="nav-badge" aria-label={`购物车共${count}件`}>{count>99?'99+':count}</span>}</span><span>{label}</span></NavLink>)}</nav>
 }
 export function ProductCard({ product }: { product: Product }) {
   const { favorites, toggleFavorite } = useShop()

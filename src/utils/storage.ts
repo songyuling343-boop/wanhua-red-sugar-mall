@@ -4,4 +4,4 @@ export function readStorage<T>(key: string, fallback: T): T {
 export function writeStorage(key: string, value: unknown) {
   try { localStorage.setItem(key, JSON.stringify(value)); return true } catch { return false }
 }
-export const money = (value: number) => value.toFixed(2).replace(/\.00$/, '')
+export const money = (value: number) => value.toFixed(2)
