@@ -25,3 +25,5 @@ button,a,input,select,textarea{-webkit-tap-highlight-color:transparent}button:no
 .home-welcome>.home-welcome-ip{clip-path:inset(0 15% 0 0)}
 
 .external-activity-note{font-size:10px;line-height:1.8;color:#9b7d5d;text-align:center;margin:10px 0 13px}.welcome-modal .welcome-external-note{display:block;font-size:10px;color:#9b7d5d;line-height:1.8;letter-spacing:0;margin:0 0 13px}
+/* Keep the welcome close control inside the rounded, clipped card edge. */
+.welcome-modal .modal-close{top:44px;right:26px;z-index:1}
