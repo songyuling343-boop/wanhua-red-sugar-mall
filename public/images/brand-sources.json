@@ -16,11 +16,11 @@
     "conversion": "WebP quality 88; logo resized to 320px, other dimensions unchanged; original reference retained"
   },
   {
-    "file": "three-sub-brands-showcase.webp",
-    "source": "reference/brand/three-sub-brands-showcase.png",
-    "width": 1268,
-    "height": 761,
-    "bytes": 35576,
-    "conversion": "WebP quality 88; logo resized to 320px, other dimensions unchanged; original reference retained"
+    "file": "three-sub-brands-clean.webp",
+    "source": "reference/brand/three-sub-brands-clean.png",
+    "width": 960,
+    "height": 540,
+    "bytes": 64540,
+    "conversion": "Lossless WebP; original dimensions and pixels retained"
   }
 ]

@@ -1,3 +1,4 @@
+import { openActivity } from './activity-helpers'
 import { test, expect } from '@playwright/test'
 async function skipWelcome(page: import('@playwright/test').Page){ await page.addInitScript(()=>localStorage.setItem('wanhua-welcome-v1','true')) }
 test('first invitation, focus loop, dismissal persistence and live activity links',async({page})=>{
@@ -77,9 +78,9 @@ test('unknown product and malformed local storage recover gracefully',async({pag
 
 test('activity and invitation buttons trigger real browser navigation to configured destinations',async({page})=>{
   // Intercept only destination responses: verifies clicks and URL navigation, not external uptime.
-  await page.route('https://wanhua-red-sugar-quiz.pages.dev/**',route=>route.fulfill({contentType:'text/html',body:'<h1>Quiz navigation destination</h1>'}))
-  await page.route('https://wanqiaoqiao-blindbox.pages.dev/**',route=>route.fulfill({contentType:'text/html',body:'<h1>Blindbox navigation destination</h1>'}))
-  await page.goto('/');await page.getByRole('dialog').getByRole('link',{name:'立即测试'}).click();await expect(page).toHaveURL('https://wanhua-red-sugar-quiz.pages.dev/')
-  await page.goto('/');await page.locator('.activity-card.quiz').click();await expect(page).toHaveURL('https://wanhua-red-sugar-quiz.pages.dev/')
-  await page.goto('/');await page.locator('.activity-card.box').click();await expect(page).toHaveURL('https://wanqiaoqiao-blindbox.pages.dev/')
+  await page.context().route('https://wanhua-red-sugar-quiz.pages.dev/**',route=>route.fulfill({contentType:'text/html',body:'<h1>Quiz navigation destination</h1>'}))
+  await page.context().route('https://wanqiaoqiao-blindbox.pages.dev/**',route=>route.fulfill({contentType:'text/html',body:'<h1>Blindbox navigation destination</h1>'}))
+  await page.goto('/');await openActivity(page,page.getByRole('dialog').getByRole('link',{name:'立即测试'}),'https://wanhua-red-sugar-quiz.pages.dev/');await expect(page.getByRole('dialog')).toHaveCount(0)
+  await page.goto('/');await openActivity(page,page.locator('.activity-card.quiz'),'https://wanhua-red-sugar-quiz.pages.dev/')
+  await page.goto('/');await openActivity(page,page.locator('.activity-card.box'),'https://wanqiaoqiao-blindbox.pages.dev/')
 })

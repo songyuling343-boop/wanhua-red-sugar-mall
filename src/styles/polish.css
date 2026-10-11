@@ -23,3 +23,5 @@ button,a,input,select,textarea{-webkit-tap-highlight-color:transparent}button:no
 .home-welcome>.home-welcome-ip{position:absolute;right:-2px;bottom:3px;width:151px;aspect-ratio:1;height:auto;mix-blend-mode:multiply}.success-celebration>.celebrating-ip{width:180px;margin:12px auto 5px;border-radius:20px;aspect-ratio:1}.success-celebration .celebrating-ip img{mix-blend-mode:multiply}@media(max-width:380px){.home-welcome>.home-welcome-ip{width:135px;right:-1px;bottom:7px}}
 /* Keep neighboring poses on the source sheet outside the home welcome crop. */
 .home-welcome>.home-welcome-ip{clip-path:inset(0 15% 0 0)}
+
+.external-activity-note{font-size:10px;line-height:1.8;color:#9b7d5d;text-align:center;margin:10px 0 13px}.welcome-modal .welcome-external-note{display:block;font-size:10px;color:#9b7d5d;line-height:1.8;letter-spacing:0;margin:0 0 13px}

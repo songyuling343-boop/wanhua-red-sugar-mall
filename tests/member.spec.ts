@@ -1,3 +1,4 @@
+import { openActivity } from './activity-helpers'
 import { test,expect } from '@playwright/test'
 import type { Page } from '@playwright/test'
 async function init(page:Page){await page.addInitScript(()=>localStorage.setItem('wanhua-welcome-v1','true'))}
@@ -8,9 +9,9 @@ async function buy(page:Page,id='qiaojia-gift',quantity=1){await page.goto(`/pro
 async function pay(page:Page){await page.getByRole('button',{name:'提交订单',exact:true}).click();await page.getByRole('button',{name:'确认模拟支付'}).click();await expect(page.getByRole('heading',{name:'支付成功',exact:true})).toBeVisible();if(await page.getByRole('dialog',{name:'会员互动奖励'}).count())await page.getByRole('button',{name:'开心收下',exact:true}).click()}
 
 test('quiz entry and manual demo claim award once, persist and never claim external sync',async({page})=>{
-  await init(page);await page.route('https://wanhua-red-sugar-quiz.pages.dev/**',r=>r.fulfill({contentType:'text/html',body:'<h1>External quiz navigation fixture</h1>'}))
+  await init(page);await page.context().route('https://wanhua-red-sugar-quiz.pages.dev/**',r=>r.fulfill({contentType:'text/html',body:'<h1>External quiz navigation fixture</h1>'}))
   await page.goto('/member/activities');await expect(page.getByRole('button',{name:'我已完成测试，领取20积分'})).toBeDisabled()
-  await page.getByRole('link',{name:'进入红糖属性测试'}).click();await expect(page).toHaveURL('https://wanhua-red-sugar-quiz.pages.dev/')
+  await openActivity(page,page.getByRole('link',{name:'进入红糖属性测试'}),'https://wanhua-red-sugar-quiz.pages.dev/')
   await page.goto('/');await expect(page.getByRole('button',{name:'我已完成测试，领取20积分'})).toBeEnabled();await page.getByRole('button',{name:'我已完成测试，领取20积分'}).click();await expect(page.getByRole('dialog')).toContainText('+20');await closeReward(page)
   expect(await member(page)).toMatchObject({points:120,growth:10,quizRewardClaimed:true,quizVisited:true})
   await page.goto('/member');await expect(page.getByRole('button',{name:'测试奖励已领取'})).toBeDisabled();await expect(page.getByText('商城未读取外部测试结果，也未实时同步。')).toBeVisible()
@@ -42,9 +43,9 @@ test('fractional order amount earns floor integer points and growth',async({page
 
 test('blind visit reward once, weighted draw, repeat collection and growth independent of spending',async({page})=>{
   await init(page);await page.addInitScript(()=>{crypto.getRandomValues=((array:any)=>{array.fill(0);return array}) as typeof crypto.getRandomValues})
-  await page.route('https://wanqiaoqiao-blindbox.pages.dev/**',r=>r.fulfill({contentType:'text/html',body:'<h1>External blindbox navigation fixture</h1>'}))
-  await page.goto('/member/blindbox');await page.getByRole('link',{name:/进入盲盒游戏/}).click();await expect(page).toHaveURL('https://wanqiaoqiao-blindbox.pages.dev/')
-  await page.goto('/member/blindbox');expect((await member(page)).points).toBe(110);await page.getByRole('link',{name:/进入盲盒游戏/}).click();await page.goto('/member/blindbox');expect((await member(page)).points).toBe(110)
+  await page.context().route('https://wanqiaoqiao-blindbox.pages.dev/**',r=>r.fulfill({contentType:'text/html',body:'<h1>External blindbox navigation fixture</h1>'}))
+  await page.goto('/member/blindbox');await openActivity(page,page.getByRole('link',{name:/进入盲盒游戏/}),'https://wanqiaoqiao-blindbox.pages.dev/')
+  await page.goto('/member/blindbox');expect((await member(page)).points).toBe(110);await openActivity(page,page.getByRole('link',{name:/进入盲盒游戏/}),'https://wanqiaoqiao-blindbox.pages.dev/');await page.goto('/member/blindbox');expect((await member(page)).points).toBe(110)
   await demo(page,'设置为糖心会员');await page.goto('/member/blindbox');await page.getByRole('button',{name:'兑换收藏抽取'}).click();await page.getByRole('button',{name:'确认兑换100积分'}).click();await expect(page.getByRole('dialog',{name:'会员互动奖励'})).toContainText('金沙小巧');await closeReward(page)
   expect(await member(page)).toMatchObject({points:10,growth:200,blindboxCollection:['jinsha']});await expect(page.locator('.collection-card.unlocked')).toHaveCount(1)
   await demo(page,'恢复默认积分');await page.goto('/member/blindbox');await page.getByRole('button',{name:'兑换收藏抽取'}).click();await page.getByRole('button',{name:'确认兑换100积分'}).click();await expect(page.getByRole('dialog')).toContainText('获得重复款');await closeReward(page)
@@ -94,9 +95,9 @@ test('four derived levels, confirmations, reset to initial member without replay
 })
 
 test('reset individual states and quiz re-trigger require deliberate demo confirmation',async({page})=>{
-  await init(page);await page.route('https://wanhua-red-sugar-quiz.pages.dev/**',r=>r.fulfill({body:'quiz'}));await page.goto('/member/activities');await page.getByRole('link',{name:'进入红糖属性测试'}).click();await page.goto('/member/activities');await page.getByRole('button',{name:'我已完成测试，领取20积分'}).click();await closeReward(page)
+  await init(page);await page.context().route('https://wanhua-red-sugar-quiz.pages.dev/**',r=>r.fulfill({body:'quiz'}));await page.goto('/member/activities');await openActivity(page,page.getByRole('link',{name:'进入红糖属性测试'}),'https://wanhua-red-sugar-quiz.pages.dev/');await page.goto('/member/activities');await page.getByRole('button',{name:'我已完成测试，领取20积分'}).click();await closeReward(page)
   await demo(page,'重新触发首次测试奖励');await page.goto('/member/activities');await expect(page.getByRole('button',{name:'我已完成测试，领取20积分'})).toBeDisabled()
-  await page.getByRole('link',{name:'进入红糖属性测试'}).click();await page.goto('/member/activities');await page.getByRole('button',{name:'我已完成测试，领取20积分'}).click();await closeReward(page);expect((await member(page)).points).toBe(140)
+  await openActivity(page,page.getByRole('link',{name:'进入红糖属性测试'}),'https://wanhua-red-sugar-quiz.pages.dev/');await page.goto('/member/activities');await page.getByRole('button',{name:'我已完成测试，领取20积分'}).click();await closeReward(page);expect((await member(page)).points).toBe(140)
   await page.goto('/member/sign');await page.getByRole('button',{name:'签到领取5积分'}).click();await closeReward(page);await demo(page,'清空签到状态');await page.goto('/member/sign');await expect(page.getByRole('button',{name:'签到领取5积分'})).toBeEnabled()
   await page.goto('/member/blindbox');await page.getByRole('button',{name:'兑换收藏抽取'}).click();await page.getByRole('button',{name:'确认兑换100积分'}).click();await closeReward(page);await demo(page,'清空盲盒收藏');expect((await member(page)).blindboxCollection).toEqual([])
   await demo(page,'重置演示账号');expect(await member(page)).toMatchObject({points:100,growth:0,quizRewardClaimed:false,signedDates:[],draws:[]})
