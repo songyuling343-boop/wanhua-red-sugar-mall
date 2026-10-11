@@ -1,0 +1,26 @@
+[
+  {
+    "file": "wanhua-official-logo.webp",
+    "source": "reference/brand/wanhua-official-logo.png",
+    "width": 320,
+    "height": 320,
+    "bytes": 26572,
+    "conversion": "WebP quality 88; logo resized to 320px, other dimensions unchanged; original reference retained"
+  },
+  {
+    "file": "wan-qiaoqiao-ip-character-sheet.webp",
+    "source": "reference/brand/wan-qiaoqiao-ip-character-sheet.png",
+    "width": 1672,
+    "height": 941,
+    "bytes": 252066,
+    "conversion": "WebP quality 88; logo resized to 320px, other dimensions unchanged; original reference retained"
+  },
+  {
+    "file": "three-sub-brands-showcase.webp",
+    "source": "reference/brand/three-sub-brands-showcase.png",
+    "width": 1268,
+    "height": 761,
+    "bytes": 35576,
+    "conversion": "WebP quality 88; logo resized to 320px, other dimensions unchanged; original reference retained"
+  }
+]

@@ -5,3 +5,8 @@ test-results/
 playwright-report/
 *.local
 *.tsbuildinfo
+.wrangler/
+.env
+.env.*
+.dev.vars
+.dev.vars.*

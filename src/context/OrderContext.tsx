@@ -98,7 +98,7 @@ export function OrderProvider({ children }: { children: ReactNode }) {
     if (!writeStorage(commerce.storage.orders,next)) throw new Error('订单未能保存，未完成模拟支付。请检查本地存储后重试')
     // Save the order first; never discard cart contents when saving the order fails.
     if (current.source === 'cart' && !clearPurchased(current.items,checkoutId)) throw new Error('订单已保存，但购物车清理未完成，请重试')
-    settleOrders([order]);setOrders(next)
+    settleOrders([order],true);setOrders(next)
     return order
   }
   return <Context.Provider value={{ orders,draft,startCheckout,updateDraft,pay }}>{children}</Context.Provider>

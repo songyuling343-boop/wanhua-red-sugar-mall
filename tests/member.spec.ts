@@ -5,7 +5,7 @@ const member=(page:Page)=>page.evaluate(()=>JSON.parse(localStorage.getItem('wan
 async function closeReward(page:Page){await page.getByRole('dialog',{name:'会员互动奖励'}).getByRole('button',{name:/开心收下|收好这份甜/}).click()}
 async function demo(page:Page,label:string){await page.goto('/member/demo');await page.getByRole('button',{name:label,exact:true}).click();await expect(page.getByRole('dialog',{name:'确认演示设置'})).toBeVisible();await page.getByRole('button',{name:'确认修改',exact:true}).click()}
 async function buy(page:Page,id='qiaojia-gift',quantity=1){await page.goto(`/product/${id}`);for(let i=1;i<quantity;i++)await page.getByRole('button',{name:'增加数量'}).click();await page.getByRole('button',{name:'立即购买',exact:true}).click()}
-async function pay(page:Page){await page.getByRole('button',{name:'提交订单',exact:true}).click();await page.getByRole('button',{name:'确认模拟支付'}).click();await expect(page.getByRole('heading',{name:'支付成功',exact:true})).toBeVisible()}
+async function pay(page:Page){await page.getByRole('button',{name:'提交订单',exact:true}).click();await page.getByRole('button',{name:'确认模拟支付'}).click();await expect(page.getByRole('heading',{name:'支付成功',exact:true})).toBeVisible();if(await page.getByRole('dialog',{name:'会员互动奖励'}).count())await page.getByRole('button',{name:'开心收下',exact:true}).click()}
 
 test('quiz entry and manual demo claim award once, persist and never claim external sync',async({page})=>{
   await init(page);await page.route('https://wanhua-red-sugar-quiz.pages.dev/**',r=>r.fulfill({contentType:'text/html',body:'<h1>External quiz navigation fixture</h1>'}))
@@ -84,7 +84,7 @@ test('personality is manual and persists, and recommendation uses real catalog f
 })
 
 test('four derived levels, confirmations, reset to initial member without replaying past orders',async({page})=>{
-  await init(page);await page.goto('/member');await page.getByRole('link',{name:'比赛演示设置 · v0.3'}).click()
+  await init(page);await page.goto('/member');await page.getByRole('link',{name:'比赛演示设置 · v1.0'}).click()
   await page.getByRole('button',{name:'设置为金沙会员',exact:true}).click();await page.getByRole('button',{name:'取消',exact:true}).click();expect((await member(page)).growth).toBe(0)
   for(const [label,growth] of [['糖小友',0],['糖心会员',200],['金沙会员',600],['巧家臻享会员',1500]] as const){await demo(page,'设置为'+label);await page.goto('/member');await expect(page.locator('.member-tier strong')).toHaveText(label);expect((await member(page)).growth).toBe(growth)}
   await page.goto('/member/sign');await page.getByRole('button',{name:'签到领取5积分'}).click();await closeReward(page);await buy(page);await pay(page)

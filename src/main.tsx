@@ -7,4 +7,5 @@ import { OrderProvider } from './context/OrderContext'
 import { MemberProvider } from './context/MemberContext'
 import App from './App'
 import './styles/index.css'
+import './styles/polish.css'
 ReactDOM.createRoot(document.getElementById('root')!).render(<React.StrictMode><BrowserRouter><CartProvider><MemberProvider><OrderProvider><ShopProvider><App /></ShopProvider></OrderProvider></MemberProvider></CartProvider></BrowserRouter></React.StrictMode>)

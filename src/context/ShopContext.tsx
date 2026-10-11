@@ -18,7 +18,8 @@ export function ShopProvider({ children }: { children: ReactNode }) {
   }
   function toggleFavorite(id: string) {
     const next = favorites.includes(id) ? favorites.filter(x => x !== id) : [...favorites, id]
-    setFavorites(next); writeStorage(site.storage.favorites, next)
+    if(!writeStorage(site.storage.favorites,next)){notify('未能保存收藏，请允许本地存储后重试');return}
+    setFavorites(next)
     notify(next.includes(id) ? '已收藏这份甜' : '已取消收藏')
   }
   return <Context.Provider value={{ cart, favorites, toast, add, toggleFavorite, notify }}>{children}</Context.Provider>

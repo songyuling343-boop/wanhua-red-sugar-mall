@@ -5,7 +5,7 @@ export const memberConfig = {
   blindboxCost: 100, couponValidityDays: 30,
   couponCosts: { 'sweet-5': 100, 'sweet-10': 180, 'sweet-25': 300 } as Record<string, number>,
   couponRules: commerce.coupons,
-  version: '比赛演示设置 · v0.3',
+  version: '比赛演示设置 · v1.0',
 }
 export const levels = [
   { id:'friend', name:'糖小友', threshold:0, className:'level-friend', motto:'初见巧家，甜蜜同行', benefits:['基础积分','会员活动参与资格'] },
@@ -29,11 +29,11 @@ export const blindCharacters = [
   { id:'gold', name:'隐藏款·金糖巧巧', pose:'gold', rarity:'隐藏款', weight:3, caption:'把金色好运藏进云纹里' },
 ]
 export const demoActions = [
-  {id:'reset-account',label:'重置演示账号',description:'重置会员积分、成长、活动和收藏盲盒；保留商品收藏、购物车和历史订单，不重复补发旧订单奖励。'},
+  {id:'reset-account',label:'重置演示账号',description:'重置会员积分、成长、活动和收藏盲盒；保留商品收藏、购物车和历史订单，不重复补发旧订单奖励；刷新首页可重看首次邀请。'},
   {id:'points',label:'恢复默认积分',description:'将积分调整至100，成长值保持不变，并写入调整记录。'},
   ...levels.map(level=>({id:`level-${level.id}`,label:`设置为${level.name}`,description:`将成长值设为${level.threshold}；不改变积分。`})),
   {id:'signs',label:'清空签到状态',description:'清空签到日期，允许重新演示今日签到；不撤销已有积分。'},
   {id:'collection',label:'清空盲盒收藏',description:'清空收藏和抽取记录，不返还已花积分。'},
   {id:'quiz',label:'重新触发首次测试奖励',description:'重置测试访问和奖励标记，需再次进入测试后手动领取。'},
-  {id:'restore',label:'恢复初始演示数据',description:'会员恢复100积分、0成长、初始演示券和空活动记录；保留商城订单与购物车，旧订单不补发奖励。'},
+  {id:'restore',label:'恢复初始演示数据',description:'会员恢复100积分、0成长、初始演示券和空活动记录；保留商城订单与购物车，旧订单不补发奖励；刷新首页可重看首次邀请。'},
 ]

@@ -1,13 +1,13 @@
 export const site = {
   name: '万华巧家小碗红糖',
-  subtitle: '甜从巧家来 · 好糖慢慢熬',
+  subtitle: '云南巧家 · 品牌数字体验馆',
   priceNotice: '价格为策划展示参考，非官方实际售价',
   demoNotice: '大学生营销策划比赛 · 交互演示版',
   links: { quiz: 'https://wanhua-red-sugar-quiz.pages.dev/', blindbox: 'https://wanqiaoqiao-blindbox.pages.dev/' },
   assets: {
-    logo: '/images/wanhua-official-logo.png',
-    ip: '/images/wan-qiaoqiao-ip-character-sheet.png',
-    brands: '/images/three-sub-brands-showcase.png',
+    logo: '/images/wanhua-official-logo.webp',
+    ip: '/images/wan-qiaoqiao-ip-character-sheet.webp',
+    brands: '/images/three-sub-brands-showcase.webp',
   },
   storage: { welcome: 'wanhua-welcome-v1', cart: 'wanhua-cart-v1', favorites: 'wanhua-favorites-v1' },
   member: { enabled: true, label: '比赛演示会员服务' },

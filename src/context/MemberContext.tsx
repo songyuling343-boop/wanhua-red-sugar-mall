@@ -12,7 +12,7 @@ type Member = {
   state:MemberState; today:string; level:typeof levels[number]; reward:Reward|null; error:string;
   dismissReward:()=>void; visitActivity:(type:'quiz'|'blindbox')=>void; claimQuiz:()=>void; sign:()=>void;
   choosePersonality:(id:string)=>void; draw:()=>void; exchangeCoupon:(kindId:string)=>void;
-  availableCoupons:()=>MemberCoupon[]; settleOrders:(orders:PaidOrder[])=>void;
+  availableCoupons:()=>MemberCoupon[]; settleOrders:(orders:PaidOrder[],animateUpgrade?:boolean)=>void;
   resetDemo:(action:string,existingOrderIds:string[])=>void;
 }
 const Context=createContext<Member|null>(null)
@@ -26,7 +26,7 @@ export function MemberProvider({children}:{children:ReactNode}){
     if(!writeStorage(memberConfig.storage,next))throw new Error('会员数据未能保存，请允许浏览器本地存储后重试')
     const before=levelFor(latest.growth),after=levelFor(next.growth)
     ref.current=next;setState(next);setError('')
-    if(animate&&typeof result==='object')setReward({...result,upgrade:after.threshold>before.threshold?after.name:undefined})
+    if(animate&&typeof result==='object')setReward({...result,title:after.threshold>before.threshold?'恭喜升级！':result.title,upgrade:after.threshold>before.threshold?after.name:undefined})
   },[])
   useEffect(()=>{if(readStorage<unknown>(memberConfig.storage,null)===null)writeStorage(memberConfig.storage,ref.current)},[])
   const availableCoupons=useCallback(()=>restoreMember(readStorage<unknown>(memberConfig.storage,ref.current)).coupons.filter(c=>couponStatus(c)==='available'),[])
@@ -67,9 +67,9 @@ export function MemberProvider({children}:{children:ReactNode}){
     recordPoints(next,'积分兑换优惠券 · '+rule.title,-cost,0,'coupon:'+coupon.id)
     return {title:'兑换成功，优惠券已存入券包',points:-cost,growth:0}
   }),[mutate])
-  const settleOrders=useCallback((orders:PaidOrder[])=>{
+  const settleOrders=useCallback((orders:PaidOrder[],animateUpgrade=false)=>{
     try{mutate(next=>{
-      let changed=false
+      let changed=false,upgrade:string|undefined
       for(const order of [...orders].sort((a,b)=>Date.parse(a.createdAt)-Date.parse(b.createdAt))){
         if(Object.prototype.hasOwnProperty.call(next.orderRewards,order.orderId))continue
         const previousLevel=levelFor(next.growth)
@@ -77,12 +77,13 @@ export function MemberProvider({children}:{children:ReactNode}){
         recordPoints(next,'商城购物',base,base,'order:'+order.orderId)
         if(first)recordPoints(next,'首次完成订单额外奖励',memberConfig.rewards.firstOrderPoints,memberConfig.rewards.firstOrderGrowth,'first-order:'+order.orderId)
         next.firstOrderRewardClaimed=true;next.orderRewards[order.orderId]={points:base+(first?memberConfig.rewards.firstOrderPoints:0),growth:base+(first?memberConfig.rewards.firstOrderGrowth:0),upgrade:levelFor(next.growth).threshold>previousLevel.threshold?levelFor(next.growth).name:undefined}
+        upgrade=next.orderRewards[order.orderId].upgrade||upgrade
         const coupon=next.coupons.find(c=>c.id===(order.couponInstanceId||order.couponId))
         if(coupon&&order.discountAmount!==0){coupon.status='used';coupon.usedOrderId=order.orderId}
         changed=true
       }
-      return changed
-    },false)}catch(e){setError((e as Error).message);throw e}
+      return animateUpgrade&&upgrade?{title:'恭喜升级！',points:0,growth:0,upgrade}:changed
+    },animateUpgrade)}catch(e){setError((e as Error).message);throw e}
   },[mutate])
   const resetDemo=useCallback((action:string,existingOrderIds:string[])=>mutate(next=>{
     if(!demoActions.some(a=>a.id===action))throw new Error('演示设置无效')

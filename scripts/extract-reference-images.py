@@ -4,12 +4,10 @@ Requires PyMuPDF (only for regenerating committed images, not npm development).
 from pathlib import Path
 import fitz
 import json
-import shutil
 root = Path(__file__).resolve().parents[1]
 out = root / 'public/images'
 out.mkdir(parents=True, exist_ok=True)
-for name in ['wanhua-official-logo.png','wan-qiaoqiao-ip-character-sheet.png','three-sub-brands-showcase.png']:
-    shutil.copyfile(root/'reference/brand'/name, out/name)
+# After this script, run optimize-brand-images.py to regenerate web brand assets.
 pdf = fitz.open(root/'reference/documents/wanhua-product-catalog.pdf')
 # xrefs refer to embedded, unmodified source photographs / packaging artwork.
 images = {'sunshine':(2,24),'maternal':(3,27),'qiaojia-gift':(4,35),'golden-gift':(5,39),'princess-gift':(6,43),'china-red':(7,49),'fashion':(8,58),'family':(9,62),'princess-jar':(10,70),'pure':(11,73),'tang-lady':(12,78),'orange-family':(13,86),'new-preview':(14,pdf[13].get_images(full=True)[0][0])}

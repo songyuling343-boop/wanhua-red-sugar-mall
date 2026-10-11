@@ -4,12 +4,12 @@ import { ArrowRight, ArrowUpRight, ChevronLeft, ChevronRight, Gift, Leaf, Sparkl
 import { brands, culture, site } from '../data/site'
 import { homeSections, newArrivals, products } from '../data/products'
 import { useMember } from '../context/MemberContext'
-import { QuizRewardCard } from '../components/MemberUI'
+import { IpSprite, QuizRewardCard } from '../components/MemberUI'
 import { Header, IpPortrait, PriceNotice, ProductCard, SectionTitle } from '../components/ShopUI'
 const slides = [
-  { eyebrow:'FROM QIAOJIA, WITH LOVE',title:<>甜从巧家来<br/>好糖慢慢熬</>,description:'一碗蔗香，一份来自云南的心意。',action:'遇见巧家的甜',className:'culture-slide',to:'/category?brand=jinsha',image:'/images/qiaojia-gift.jpeg' },
-  { eyebrow:'FIND YOUR SWEET SIDE',title:<>你的红糖属性<br/>是哪一种甜？</>,description:'让万巧巧，发现藏在甜蜜里的你。',action:'开启趣味测试',className:'quiz-slide',href:site.links.quiz },
-  { eyebrow:'WAN QIAOQIAO CLUB',title:<>拆开小惊喜<br/>遇见万巧巧</>,description:'把今天的好运，藏进一份盲盒。',action:'去拆甜蜜盲盒',className:'blindbox-slide',href:site.links.blindbox },
+  { eyebrow:'FROM QIAOJIA, WITH LOVE',title:<>甜从巧家来<br/>好糖慢慢熬</>,description:'一碗蔗香，一份来自云南的心意。',action:'遇见巧家的甜',className:'culture-slide',to:'/story',image:'/images/qiaojia-gift.jpeg' },
+  { eyebrow:'FIND YOUR SWEET SIDE',title:<>测测你的红糖属性</>,description:'看看你是哪一种甜',action:'立即测试',className:'quiz-slide',href:site.links.quiz },
+  { eyebrow:'WAN QIAOQIAO CLUB',title:<>万巧巧<br/>惊喜盲盒</>,description:'收集属于你的甜蜜搭子',action:'去拆甜蜜盲盒',className:'blindbox-slide',href:site.links.blindbox },
 ]
 function Banner() {
   const [index,setIndex]=useState(0); const [paused,setPaused]=useState(false); const [touch,setTouch]=useState<number | null>(null)
@@ -24,6 +24,7 @@ function Banner() {
 export default function Home() {
   const {state:member}=useMember()
   return <><Header/><main className="home-page"><div className="home-intro"><span><i/> 云南巧家 · 蔗香日常</span><span>让每一天，都有一点甜</span></div>
+    <div className="home-welcome"><span className="eyebrow">LET THE TRADITION FEEL YOUNG</span><h1>让传统红糖，<br/>也有年轻表达。</h1><p>今天也要甜甜的呀！</p><IpSprite pose="main" className="home-welcome-ip"/><span className="home-welcome-seal">巧家<br/>来甜</span></div>
     <Banner/>
     <div className="welcome-strip"><IpPortrait/><div><strong>今天也要甜甜的呀！</strong><p>万巧巧陪你挑一份属于自己的甜。</p></div><Sparkles size={19}/></div>
     {member.quizVisited&&!member.quizRewardClaimed&&<QuizRewardCard/>}
@@ -33,7 +34,7 @@ export default function Home() {
     <section className="home-products"><SectionTitle {...homeSections[1]} to="/category?group=popular"/><div className="product-grid">{products.filter(p=>p.groups.includes('popular')).slice(0,4).map(p=><ProductCard product={p} key={p.id}/>)}</div></section>
     <section className="new-section"><SectionTitle title="新品专区" subtitle="企业新品灵感 · 敬请期待" english="SOMETHING NEW"/><div className="new-grid">{newArrivals.map((item,i)=><div key={item.name} className="new-card">{i===0?<Coffee size={32}/>:<Leaf size={32}/>}<span className="mini-tag">新品预告</span><h3>{item.name}</h3><p>{item.description}</p><small>{item.note}</small></div>)}</div></section>
     {homeSections.slice(2).map(section=><section className="home-products" key={section.id}><SectionTitle {...section} to={`/category?group=${section.id}`}/><div className="product-grid">{products.filter(p=>p.groups.includes(section.id)).slice(0,4).map(p=><ProductCard key={p.id} product={p}/>)}</div></section>)}
-    <section className="culture-section"><span className="eyebrow">THE STORY BEHIND THE SWEET</span><div className="culture-seal">巧家<br/>风物</div><h2>{culture.title}</h2><p>{culture.text}</p><div className="culture-values"><span><Leaf size={17}/>金沙江河谷</span><span><Flame size={17}/>柴火慢熬</span><span><Gift size={17}/>小碗成糖</span></div><blockquote>{culture.motto}</blockquote><details><summary>认识万华的三个品牌<ChevronRight size={15}/></summary><img src={site.assets.brands} alt="企业提供的金沙唐韵、呵糖、上古红糖公主品牌展示截图" loading="lazy"/><p className="subtle-note">企业提供的品牌展示资料</p></details></section>
-    <footer className="site-footer"><img src={site.assets.logo} alt="万华官方 Logo"/><strong>{site.name}</strong><p>{site.demoNotice}</p><PriceNotice/><span>一份来自巧家的甜，愿你慢慢喜欢。</span></footer>
+    <section className="culture-section"><span className="eyebrow">THE STORY BEHIND THE SWEET</span><div className="culture-seal">巧家<br/>风物</div><h2>{culture.title}</h2><p>{culture.text}</p><div className="culture-values"><span><Leaf size={17}/>金沙江河谷</span><span><Flame size={17}/>柴火慢熬</span><span><Gift size={17}/>小碗成糖</span></div><blockquote>{culture.motto}</blockquote><Link to="/story" className="culture-story-link">读一读巧家的红糖故事<ArrowUpRight size={16}/></Link><details><summary>认识万华的三个品牌<ChevronRight size={15}/></summary><img src={site.assets.brands} alt="企业提供的金沙唐韵、呵糖、上古红糖公主品牌展示截图" loading="lazy"/><p className="subtle-note">企业提供的品牌展示资料</p></details></section>
+    <footer className="site-footer"><div className="footer-links"><Link to="/story">品牌故事</Link><Link to="/guide">演示指南</Link></div><img src={site.assets.logo} alt="万华官方 Logo"/><strong>{site.name}</strong><p>{site.demoNotice}</p><PriceNotice/><span>一份来自巧家的甜，愿你慢慢喜欢。</span></footer>
   </main></>
 }

@@ -2,7 +2,7 @@ import { test, expect } from '@playwright/test'
 import type { Page } from '@playwright/test'
 async function init(page:Page){await page.addInitScript(()=>localStorage.setItem('wanhua-welcome-v1','true'))}
 async function add(page:Page,id:string,flavor?:string){await page.goto(`/product/${id}`);if(flavor)await page.getByRole('button',{name:flavor,exact:true}).click();await page.getByRole('button',{name:'加入购物车',exact:true}).click()}
-async function submitAndPay(page:Page){await page.getByRole('button',{name:'提交订单',exact:true}).click();await expect(page).toHaveURL(/\/payment\//);await expect(page.getByText('比赛演示模式，本页面不会发生真实支付。')).toBeVisible();await page.getByRole('button',{name:'确认模拟支付'}).click();await expect(page).toHaveURL(/\/payment-success\//);await expect(page.getByRole('heading',{name:'支付成功',exact:true})).toBeVisible()}
+async function submitAndPay(page:Page){await page.getByRole('button',{name:'提交订单',exact:true}).click();await expect(page).toHaveURL(/\/payment\//);await expect(page.getByText('比赛演示模式，本页面不会发生真实支付。')).toBeVisible();await page.getByRole('button',{name:'确认模拟支付'}).click();await expect(page).toHaveURL(/\/payment-success\//);await expect(page.getByRole('heading',{name:'支付成功',exact:true})).toBeVisible();if(await page.getByRole('dialog',{name:'会员互动奖励'}).count())await page.getByRole('button',{name:'开心收下',exact:true}).click()}
 const row=(page:Page,key:string)=>page.locator(`[data-cart-key="${key}"]`)
 const history=(page:Page)=>page.evaluate(()=>JSON.parse(localStorage.getItem('wanhua-orders-v1')||'[]'))
 

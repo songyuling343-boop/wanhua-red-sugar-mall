@@ -12,7 +12,7 @@ test('first invitation, focus loop, dismissal persistence and live activity link
   await expect(page.getByRole('link',{name:'红糖属性测试'})).toHaveAttribute('href','https://wanhua-red-sugar-quiz.pages.dev/')
   await expect(page.locator('.activity-card.box')).toHaveAttribute('href','https://wanqiaoqiao-blindbox.pages.dev/')
   await page.getByRole('button',{name:'切换到第2张 Banner'}).click()
-  await expect(page.locator('.hero-banner')).toContainText('你的红糖属性')
+  await expect(page.locator('.hero-banner')).toContainText('测测你的红糖属性')
   await page.getByRole('button',{name:'切换到第3张 Banner'}).click()
   await expect(page.locator('.hero-link')).toHaveAttribute('href','https://wanqiaoqiao-blindbox.pages.dev/')
 })
