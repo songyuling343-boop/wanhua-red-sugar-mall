@@ -52,7 +52,7 @@ test('required flow 4: cart, checkout edits and order history survive refresh an
   await page.reload();await expect(page.getByRole('textbox',{name:'详细地址',exact:true})).toHaveValue('比赛演示街道 12 号');await expect(page.getByRole('radio',{name:'不使用优惠券'})).toBeChecked()
   await page.getByRole('button',{name:'提交订单',exact:true}).click();await page.getByRole('link',{name:'返回修改订单'}).click();await expect(page.getByRole('textbox',{name:'订单备注'})).toHaveValue('请使用演示地址')
   await submitAndPay(page);await page.reload();await expect(page.getByRole('heading',{name:'支付成功',exact:true})).toBeVisible()
-  await page.getByRole('link',{name:'会员中心',exact:true}).click();await page.getByRole('link',{name:/我的订单/}).click();await expect(page.locator('.order-list-card')).toHaveCount(1)
+  await page.getByRole('link',{name:'会员中心',exact:true}).click();await page.getByRole('link',{name:'我的订单',exact:true}).click();await expect(page.locator('.order-list-card')).toHaveCount(1)
   await page.reload();await expect(page.locator('.order-list-card')).toHaveCount(1);await page.locator('.order-list-card').click();await expect(page.locator('.saved-receiver')).toContainText('比赛演示街道 12 号')
 })
 

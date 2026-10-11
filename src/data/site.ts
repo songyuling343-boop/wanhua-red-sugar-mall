@@ -10,7 +10,7 @@ export const site = {
     brands: '/images/three-sub-brands-showcase.png',
   },
   storage: { welcome: 'wanhua-welcome-v1', cart: 'wanhua-cart-v1', favorites: 'wanhua-favorites-v1' },
-  member: { enabled: false, label: '会员服务将在后续阶段开放' },
+  member: { enabled: true, label: '比赛演示会员服务' },
 }
 export type BrandId = 'jinsha' | 'princess' | 'her'
 export const brands: { id: BrandId; name: string; english: string; description: string; story: string; className: string }[] = [

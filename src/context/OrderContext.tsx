@@ -4,20 +4,21 @@ import { products } from '../data/products'
 import { brandById } from '../data/site'
 import { commerce } from '../data/commerce'
 import { readStorage, writeStorage } from '../utils/storage'
-import { bestCoupon, calculateAmounts } from '../utils/pricing'
+import { calculateAmounts, toCents } from '../utils/pricing'
 import { generateOrderId, isReceiver, receiverAddress, uniqueId, validateReceiver } from '../utils/orders'
 import type { Receiver } from '../utils/orders'
 import { isCartItem, useCart } from './CartContext'
 import type { CartItem } from './CartContext'
+import { useMember } from './MemberContext'
 export type OrderItem = CartItem & { name: string; brand: string; spec: string; image: string; unitPrice: number }
 export type CheckoutDraft = {
   checkoutId: string; source: 'cart' | 'buyNow'; items: CartItem[]; receiverInfo: Receiver;
-  couponId: string | null; remark: string; paymentMethod: string;
+  couponId: string | null; couponInstanceId?: string | null; remark: string; paymentMethod: string;
 }
 export type Order = {
   orderId: string; checkoutId: string; createdAt: string; status: string; items: OrderItem[];
   goodsAmount: number; discountAmount: number; shippingFee: number; finalAmount: number;
-  receiver: string; phone: string; address: string; remark: string; paymentMethod: string; couponId: string | null;
+  receiver: string; phone: string; address: string; remark: string; paymentMethod: string; couponId: string | null; couponInstanceId?: string | null;
 }
 export function checkoutLines(items: CartItem[]): OrderItem[] {
   return items.map(item => {
@@ -42,7 +43,7 @@ function restoreOrders(raw: unknown): Order[] {
 type OrderState = {
   orders: Order[]; draft: CheckoutDraft | null;
   startCheckout: (source: CheckoutDraft['source'], items: CartItem[]) => string;
-  updateDraft: (changes: Partial<Pick<CheckoutDraft,'receiverInfo' | 'couponId' | 'remark' | 'paymentMethod'>>) => void;
+  updateDraft: (changes: Partial<Pick<CheckoutDraft,'receiverInfo' | 'couponId' | 'couponInstanceId' | 'remark' | 'paymentMethod'>>) => void;
   pay: (checkoutId: string) => Order;
 }
 const Context = createContext<OrderState | null>(null)
@@ -51,17 +52,21 @@ export function OrderProvider({ children }: { children: ReactNode }) {
   const [draft,setDraft] = useState(() => restoreDraft(readStorage<unknown>(commerce.storage.draft,null)))
   const draftRef = useRef(draft)
   const { clearPurchased } = useCart()
+  const { availableCoupons,settleOrders } = useMember()
   useEffect(() => {
     // Recover an interrupted cart cleanup after an order was durably saved.
     if (draft?.source === 'cart' && orders.some(o=>o.checkoutId === draft.checkoutId)) clearPurchased(draft.items,draft.checkoutId)
   }, [draft,orders,clearPurchased])
+  useEffect(()=>{try{settleOrders(orders)}catch{/* MemberContext exposes retryable storage errors. */}},[orders,settleOrders])
   function startCheckout(source: CheckoutDraft['source'], items: CartItem[]) {
     if (!items.length || !items.every(isCartItem)) throw new Error('请先选择需要结算的商品')
-    const next: CheckoutDraft = { checkoutId: uniqueId(), source, items: items.map(({ productId,flavor,quantity })=>({productId,flavor,quantity})), receiverInfo: draftRef.current?.receiverInfo || { ...commerce.defaultReceiver }, couponId: bestCoupon(checkoutLines(items)), remark: '', paymentMethod: commerce.paymentMethods[0].id }
+    const goods=checkoutLines(items).reduce((sum,item)=>sum+toCents(item.unitPrice)*item.quantity,0)
+    const best=availableCoupons().filter(c=>commerce.coupons.some(rule=>rule.id===c.kindId&&goods>=rule.threshold)).sort((a,b)=>commerce.coupons.find(r=>r.id===b.kindId)!.discount-commerce.coupons.find(r=>r.id===a.kindId)!.discount)[0]
+    const next: CheckoutDraft = { checkoutId: uniqueId(), source, items: items.map(({ productId,flavor,quantity })=>({productId,flavor,quantity})), receiverInfo: draftRef.current?.receiverInfo || { ...commerce.defaultReceiver }, couponId: best?.kindId||null, couponInstanceId: best?.id||null, remark: '', paymentMethod: commerce.paymentMethods[0].id }
     if (!writeStorage(commerce.storage.draft,next)) throw new Error('浏览器无法保存结算信息，请允许本地存储后重试')
     draftRef.current = next; setDraft(next); return next.checkoutId
   }
-  function updateDraft(changes: Partial<Pick<CheckoutDraft,'receiverInfo' | 'couponId' | 'remark' | 'paymentMethod'>>) {
+  function updateDraft(changes: Partial<Pick<CheckoutDraft,'receiverInfo' | 'couponId' | 'couponInstanceId' | 'remark' | 'paymentMethod'>>) {
     if (!draftRef.current) return
     const next = { ...draftRef.current, ...changes }
     if (!writeStorage(commerce.storage.draft,next)) throw new Error('未能保存修改，请检查浏览器本地存储')
@@ -75,23 +80,25 @@ export function OrderProvider({ children }: { children: ReactNode }) {
     const existing = latest.find(o=>o.checkoutId===checkoutId)
     if (existing) {
       if (current?.checkoutId === checkoutId && current.source === 'cart' && !clearPurchased(current.items,checkoutId)) throw new Error('订单已保存，但购物车清理未完成，请重试')
-      setOrders(latest); return existing
+      settleOrders([existing]);setOrders(latest); return existing
     }
     if (!current || current.checkoutId !== checkoutId) throw new Error('结算信息已变更，请返回购物车重新选择')
     if (Object.keys(validateReceiver(current.receiverInfo)).length) throw new Error('请先填写完整、正确的收货信息')
     if (!commerce.paymentMethods.some(method=>method.id===current.paymentMethod)) throw new Error('请选择模拟支付方式')
     const items = checkoutLines(current.items)
-    const amounts = calculateAmounts(items,current.couponId)
+    const coupon=current.couponId?availableCoupons().find(c=>current.couponInstanceId?c.id===current.couponInstanceId:c.kindId===current.couponId):null
+    if(current.couponId&&!coupon)throw new Error('所选优惠券已使用或过期，请返回订单确认页重新选择')
+    const amounts = calculateAmounts(items,coupon?.kindId||null)
     const order: Order = {
       orderId: generateOrderId(latest.map(o=>o.orderId)), checkoutId, createdAt: new Date().toISOString(), status: commerce.status,
       items, goodsAmount: amounts.goodsAmount, discountAmount: amounts.discountAmount, shippingFee: amounts.shippingFee, finalAmount: amounts.finalAmount,
-      receiver: current.receiverInfo.receiver.trim(), phone: current.receiverInfo.phone.trim(), address: receiverAddress(current.receiverInfo), remark: current.remark.trim(), paymentMethod: current.paymentMethod, couponId: amounts.couponId,
+      receiver: current.receiverInfo.receiver.trim(), phone: current.receiverInfo.phone.trim(), address: receiverAddress(current.receiverInfo), remark: current.remark.trim(), paymentMethod: current.paymentMethod, couponId: amounts.couponId, couponInstanceId: amounts.couponId?coupon?.id||null:null,
     }
     const next = [order,...latest]
     if (!writeStorage(commerce.storage.orders,next)) throw new Error('订单未能保存，未完成模拟支付。请检查本地存储后重试')
     // Save the order first; never discard cart contents when saving the order fails.
     if (current.source === 'cart' && !clearPurchased(current.items,checkoutId)) throw new Error('订单已保存，但购物车清理未完成，请重试')
-    setOrders(next)
+    settleOrders([order]);setOrders(next)
     return order
   }
   return <Context.Provider value={{ orders,draft,startCheckout,updateDraft,pay }}>{children}</Context.Provider>

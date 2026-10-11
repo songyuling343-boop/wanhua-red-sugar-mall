@@ -3,11 +3,12 @@ import { Link, useNavigate } from 'react-router-dom'
 import { Trash2, ShoppingBag, ArrowRight } from 'lucide-react'
 import { useShop } from '../context/ShopContext'
 import { cartKey, useCart } from '../context/CartContext'
+import { useMember } from '../context/MemberContext'
 import { checkoutLines, useOrders } from '../context/OrderContext'
 import { brandById } from '../data/site'
 import { products } from '../data/products'
 import { commerce } from '../data/commerce'
-import { bestCoupon, calculateAmounts } from '../utils/pricing'
+import { calculateAmounts, toCents } from '../utils/pricing'
 import { money } from '../utils/storage'
 import { EmptyState, Header, PriceNotice } from '../components/ShopUI'
 import { AmountBreakdown, DemoNotice, QuantityControl } from '../components/CommerceUI'
@@ -15,7 +16,10 @@ export default function Cart() {
   const {cart,count,selectedItems,changeQuantity,removeItem,selectItem,selectAll}=useCart()
   const {notify}=useShop(), {startCheckout}=useOrders(), navigate=useNavigate()
   const [deleteKey,setDeleteKey]=useState<string | null>(null)
-  const lines=checkoutLines(selectedItems), amounts=calculateAmounts(lines,bestCoupon(lines))
+  const {availableCoupons}=useMember()
+  const lines=checkoutLines(selectedItems), goods=lines.reduce((sum,line)=>sum+toCents(line.unitPrice)*line.quantity,0)
+  const best=availableCoupons().map(c=>commerce.coupons.find(rule=>rule.id===c.kindId)!).filter(rule=>goods>=rule.threshold).sort((a,b)=>b.discount-a.discount)[0]
+  const amounts=calculateAmounts(lines,best?.id||null)
   const allSelected=cart.length>0&&selectedItems.length===cart.length
   function mutate(action: () => void){try{action()}catch(error){notify((error as Error).message)}}
   function checkout(){try{navigate(`/checkout/${startCheckout('cart',selectedItems)}`)}catch(error){notify((error as Error).message)}}

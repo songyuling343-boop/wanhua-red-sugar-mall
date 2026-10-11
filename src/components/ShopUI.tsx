@@ -19,7 +19,7 @@ export function BottomNav() {
   const {cart} = useShop(); const count = cart.reduce((n,x)=>n+x.quantity,0)
   return <nav className="bottom-nav" aria-label="底部导航">{[
     { path:'/', label:'首页', icon:Home }, { path:'/category', label:'分类', icon:LayoutGrid }, { path:'/cart', label:'购物车', icon:ShoppingBag }, { path:'/member', label:'会员中心', icon:UserRound },
-  ].map(({ path,label,icon:Icon }) => <NavLink key={path} to={path} end className={({isActive}) => (isActive || (path==='/member' && pathname.startsWith('/orders'))) ? 'nav-item active' : 'nav-item'}><span className="relative"><Icon size={21} strokeWidth={1.7}/>{path==='/cart' && count>0 && <span className="nav-badge" aria-label={`购物车共${count}件`}>{count>99?'99+':count}</span>}</span><span>{label}</span></NavLink>)}</nav>
+  ].map(({ path,label,icon:Icon }) => <NavLink key={path} to={path} end className={({isActive}) => (isActive || (path==='/member' && (pathname.startsWith('/orders')||pathname.startsWith('/member/')))) ? 'nav-item active' : 'nav-item'}><span className="relative"><Icon size={21} strokeWidth={1.7}/>{path==='/cart' && count>0 && <span className="nav-badge" aria-label={`购物车共${count}件`}>{count>99?'99+':count}</span>}</span><span>{label}</span></NavLink>)}</nav>
 }
 export function ProductCard({ product }: { product: Product }) {
   const { favorites, toggleFavorite } = useShop()

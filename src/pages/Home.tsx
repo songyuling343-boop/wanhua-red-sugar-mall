@@ -3,6 +3,8 @@ import { Link } from 'react-router-dom'
 import { ArrowRight, ArrowUpRight, ChevronLeft, ChevronRight, Gift, Leaf, Sparkles, Flame, Coffee } from 'lucide-react'
 import { brands, culture, site } from '../data/site'
 import { homeSections, newArrivals, products } from '../data/products'
+import { useMember } from '../context/MemberContext'
+import { QuizRewardCard } from '../components/MemberUI'
 import { Header, IpPortrait, PriceNotice, ProductCard, SectionTitle } from '../components/ShopUI'
 const slides = [
   { eyebrow:'FROM QIAOJIA, WITH LOVE',title:<>甜从巧家来<br/>好糖慢慢熬</>,description:'一碗蔗香，一份来自云南的心意。',action:'遇见巧家的甜',className:'culture-slide',to:'/category?brand=jinsha',image:'/images/qiaojia-gift.jpeg' },
@@ -20,9 +22,11 @@ function Banner() {
   </section>
 }
 export default function Home() {
+  const {state:member}=useMember()
   return <><Header/><main className="home-page"><div className="home-intro"><span><i/> 云南巧家 · 蔗香日常</span><span>让每一天，都有一点甜</span></div>
     <Banner/>
     <div className="welcome-strip"><IpPortrait/><div><strong>今天也要甜甜的呀！</strong><p>万巧巧陪你挑一份属于自己的甜。</p></div><Sparkles size={19}/></div>
+    {member.quizVisited&&!member.quizRewardClaimed&&<QuizRewardCard/>}
     <section className="brand-section"><SectionTitle title="四种相遇，一样甜蜜" english="CHOOSE YOUR SWEET"/><div className="brand-grid">{brands.map((brand,i)=><Link key={brand.id} to={`/category?brand=${brand.id}`} className={`brand-card ${brand.className}`}><span className="brand-number">0{i+1}</span><span className="brand-symbol">{i===0?'韵':i===1?'甜':'呵'}</span><strong>{brand.name}</strong><small>{brand.english}</small><p>{brand.description}</p><ArrowUpRight size={17}/></Link>)}<a href={site.links.blindbox} className="brand-card blindbox"><span className="brand-number">04</span><Gift className="brand-gift" size={38}/><strong>万巧巧盲盒系列</strong><small>WAN QIAOQIAO CLUB</small><p>打开一盒，收获一份惊喜</p><ArrowUpRight size={17}/></a></div><p className="subtle-note">万巧巧盲盒为 IP 互动衍生系列</p></section>
     <section className="home-products"><SectionTitle {...homeSections[0]} to="/category"/><PriceNotice/><div className="product-grid">{products.filter(p=>p.groups.includes('recommend')).slice(0,4).map(p=><ProductCard product={p} key={p.id}/>)}</div></section>
     <section className="activity-section"><SectionTitle title="甜蜜不止一种玩法" subtitle="和万巧巧一起，把日常变有趣" english="SWEET LITTLE MOMENTS"/><a href={site.links.quiz} className="activity-card quiz"><Sparkles size={26}/><div><span>红糖属性测试</span><p>你是哪种甜？一测就知道</p></div><ArrowUpRight size={20}/></a><a href={site.links.blindbox} className="activity-card box"><Gift size={26}/><div><span>万巧巧盲盒</span><p>今天的小惊喜，等你亲手打开</p></div><ArrowUpRight size={20}/></a></section>

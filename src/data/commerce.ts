@@ -6,7 +6,7 @@ export const commerce = {
     { id: 'sweet-25', threshold: 19900, discount: 2500, title: '满 199 减 25' },
   ],
   shipping: { freeThreshold: 9900, fee: 800 },
-  points: { enabled: false, message: '积分功能将在会员体系中启用' },
+  points: { enabled: false, message: '积分可兑换优惠券，暂不直接抵扣现金' },
   defaultReceiver: { receiver: '万巧巧', phone: '13800000000', province: '云南省', city: '昭通市', district: '巧家县', detail: '演示地址（比赛展示，无需真实收货）' },
   paymentMethods: [
     { id: 'wechat', label: '微信支付（演示）', short: '微', className: 'wechat' },

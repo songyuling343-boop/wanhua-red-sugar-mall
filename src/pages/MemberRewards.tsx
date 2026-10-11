@@ -1,0 +1,27 @@
+import { Link } from 'react-router-dom'
+import { CalendarCheck, Check, Coins, Ticket, ArrowUpRight, Heart } from 'lucide-react'
+import { useMember } from '../context/MemberContext'
+import { useShop } from '../context/ShopContext'
+import { memberConfig } from '../data/member'
+import { products } from '../data/products'
+import { dayKey,couponStatus } from '../utils/member'
+import { formatOrderTime } from '../utils/orders'
+import { money } from '../utils/storage'
+import { useState } from 'react'
+import { EmptyState, Header, ProductCard, SectionTitle } from '../components/ShopUI'
+import { IpSprite, MemberNotice, MemberWayBack } from '../components/MemberUI'
+export function Points(){
+  const {state}=useMember()
+  return <><Header title="我的甜蜜积分" back/><main className="member-subpage"><SectionTitle title="把每一份甜，攒成惊喜" english="SWEET POINTS"/><div className="points-overview"><Coins size={25}/><span>当前可用积分</span><strong>{state.points}</strong><p>成长值 {state.growth} · 兑换不会减少成长值</p><Link to="/member/coupons">去兑换甜蜜礼遇<ArrowUpRight size={15}/></Link></div><MemberNotice/><section className="commerce-panel"><h2>积分明细<span className="panel-caption">余额随每笔记录保存</span></h2><div className="point-history">{state.pointHistory.map(p=><article key={p.id}><div><h3>{p.source}</h3><p>{formatOrderTime(p.createdAt)}</p><small>当时余额 {p.balance} · 成长值 {p.growthDelta>=0?'+':''}{p.growthDelta}</small></div><strong className={p.delta<0?'spent':''}>{p.delta>=0?'+':''}{p.delta}</strong></article>)}</div></section><section className="commerce-panel points-rules"><h2>怎么攒甜蜜？</h2><p>首次趣味测试 +20积分、+10成长值（手动确认）</p><p>每日签到 +5积分 · 首访盲盒活动 +10积分</p><p>模拟消费实付金额每1元 +1积分、+1成长值，向下取整</p><p>首次订单额外 +30积分、+20成长值</p><p>初始100积分为比赛演示赠送，不属于企业正式规则。</p></section><MemberWayBack/></main></>
+}
+export function SignIn(){
+  const {state,today,sign}=useMember(),{notify}=useShop(),signed=state.signedDates.includes(today)
+  const days=Array.from({length:7},(_,i)=>{const date=new Date(today+'T12:00:00+08:00');date.setTime(date.getTime()-(6-i)*86400000);return dayKey(date)})
+  return <><Header title="每日甜蜜签到" back/><main className="member-subpage"><section className="sign-hero"><span className="eyebrow">A LITTLE SWEET, EVERY DAY</span><IpSprite pose="cane"/><h1>把日常过成甜蜜</h1><p>每天签到一次，收下5积分的小心意。</p><strong>已签到 {state.signedDates.length} 天</strong></section><div className="sign-calendar">{days.map((date,i)=><div key={date} className={state.signedDates.includes(date)?'signed':''}><small>Day {i+1}</small><span>{state.signedDates.includes(date)?<Check size={16}/>:<CalendarCheck size={16}/>}</span><b>{date.slice(5)}</b></div>)}</div><button className="primary-button sign-button" disabled={signed} onClick={()=>{try{sign()}catch(e){notify((e as Error).message)}}}>{signed?'今日已签到':'签到领取5积分'}</button><p className="member-notice">按北京时间判断日期 · 最近7天展示 · 不设连续签到奖励</p><MemberNotice/><p className="member-notice">签到只增加积分，不增加成长值；刷新不会重复领取。</p><MemberWayBack/></main></>
+}
+export function Coupons(){
+  const {state,exchangeCoupon}=useMember(),{notify}=useShop(),[tab,setTab]=useState('available')
+  const visible=state.coupons.filter(c=>couponStatus(c)===tab)
+  return <><Header title="我的甜蜜优惠券" back/><main className="member-subpage"><SectionTitle title="用甜蜜，兑换下一份甜" english="SWEET LITTLE PRIVILEGES"/><div className="coupon-point-balance">可用积分 <strong>{state.points}</strong><Link to="/member/points">查看明细 →</Link></div><MemberNotice/><section className="coupon-exchange"><h2><Ticket size={18}/>积分兑换专区</h2>{memberConfig.couponRules.map(rule=><div key={rule.id}><div><strong>{rule.title}</strong><small>{memberConfig.couponCosts[rule.id]}积分 · 有效期30天</small></div><button aria-label={`兑换${rule.title}`} disabled={state.points<memberConfig.couponCosts[rule.id]} onClick={()=>{try{exchangeCoupon(rule.id);notify('优惠券兑换成功')}catch(e){notify((e as Error).message)}}}>兑换</button></div>)}</section><div className="coupon-status-tabs" role="group" aria-label="优惠券状态">{[{id:'available',label:'可使用'},{id:'used',label:'已使用'},{id:'expired',label:'已过期'}].map(t=><button key={t.id} className={tab===t.id?'active':''} onClick={()=>setTab(t.id)}>{t.label}（{state.coupons.filter(c=>couponStatus(c)===t.id).length}）</button>)}</div><div className="coupon-wallet">{visible.map(c=>{const rule=memberConfig.couponRules.find(r=>r.id===c.kindId)!;return <article key={c.id} data-wallet-coupon={c.id} className={`wallet-coupon ${couponStatus(c)}`}><div className="coupon-value"><strong>¥{money(rule.discount/100)}</strong><span>满¥{money(rule.threshold/100)}可用</span></div><div><h3>{rule.title}</h3><p>来源：{c.source}</p><p>有效期至 {formatOrderTime(c.expiresAt)}</p><small>{couponStatus(c)==='used'?'已使用':couponStatus(c)==='expired'?'已过期':'可使用 · 演示券'}</small>{couponStatus(c)==='available'&&<Link to="/category">去挑好糖 →</Link>}</div></article>})}{!visible.length&&<div className="favorites-empty"><Ticket size={24}/><p>这里还没有优惠券，去攒一点甜蜜吧。</p></div>}</div><MemberWayBack/></main></>
+}
+export function Favorites(){const {favorites}=useShop(),saved=products.filter(p=>favorites.includes(p.id));return <><Header title="我的好糖收藏" back/><main className="member-subpage"><SectionTitle title={`喜欢的甜 · ${saved.length}`} english="MY SWEET FAVORITES"/><MemberNotice/>{saved.length?<div className="product-grid">{saved.map(p=><ProductCard key={p.id} product={p}/>)}</div>:<EmptyState title="留一颗爱心，记住一份甜" text="到商品页或商品卡片点击爱心，就能在这里找到它。"/>}<p className="member-notice"><Heart size={12}/>再次点击爱心即可取消收藏。</p><MemberWayBack/></main></>}

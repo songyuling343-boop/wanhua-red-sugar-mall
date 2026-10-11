@@ -2,6 +2,7 @@ import { useRef, useState } from 'react'
 import { Navigate, useNavigate, useParams, Link } from 'react-router-dom'
 import { LockKeyhole, Check, ArrowLeft } from 'lucide-react'
 import { checkoutLines, useOrders } from '../context/OrderContext'
+import { useMember } from '../context/MemberContext'
 import { useShop } from '../context/ShopContext'
 import { commerce } from '../data/commerce'
 import { calculateAmounts } from '../utils/pricing'
@@ -11,13 +12,16 @@ import { EmptyState, Header } from '../components/ShopUI'
 import { DemoNotice } from '../components/CommerceUI'
 export default function Payment(){
   const {checkoutId}=useParams(), {draft,orders,updateDraft,pay}=useOrders(), {notify}=useShop(), navigate=useNavigate()
+  const {availableCoupons}=useMember()
   const lock=useRef(false), [busy,setBusy]=useState(false), [error,setError]=useState('')
   const existing=orders.find(order=>order.checkoutId===checkoutId)
   if(existing)return <Navigate to={`/payment-success/${existing.orderId}`} replace/>
   if(!draft||draft.checkoutId!==checkoutId)return <><Header title="模拟支付" back/><EmptyState title="还没有准备好这份甜" text="请先确认商品与收货信息。" action="返回购物车" to="/cart"/></>
   const current=draft
   if(Object.keys(validateReceiver(current.receiverInfo)).length)return <Navigate to={`/checkout/${current.checkoutId}`} replace/>
-  const amounts=calculateAmounts(checkoutLines(current.items),current.couponId)
+  const coupon=availableCoupons().find(c=>current.couponInstanceId?c.id===current.couponInstanceId:c.kindId===current.couponId)
+  if(current.couponId&&!coupon)return <Navigate to={`/checkout/${current.checkoutId}`} replace/>
+  const amounts=calculateAmounts(checkoutLines(current.items),coupon?.kindId||null)
   function confirm(){
     if(lock.current)return
     lock.current=true;setBusy(true);setError('')
