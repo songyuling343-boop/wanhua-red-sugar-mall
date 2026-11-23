@@ -33,3 +33,34 @@ button,a,input,select,textarea{-webkit-tap-highlight-color:transparent}button:no
 .activity-header button{display:flex;align-items:center;justify-content:center;gap:4px;height:44px;font-size:13px;white-space:nowrap}
 .activity-header h1{text-align:center;font-size:15px;font-weight:650;margin:0;white-space:nowrap}
 .activity-frame{display:block;flex:1;width:100%;min-height:0;border:0;background:#FFF8ED}
+
+.mall-guide {
+  position: fixed;
+  right: max(10px, calc((100vw - 430px) / 2 + 10px));
+  bottom: calc(84px + env(safe-area-inset-bottom, 0px));
+  z-index: 8;
+  display: grid;
+  justify-items: center;
+  text-decoration: none;
+}
+.mall-guide .ip-portrait {
+  width: 58px;
+  height: 62px;
+  border-radius: 48%;
+  filter: drop-shadow(0 3px 3px #63341d38);
+  animation: guide-bob 4s ease-in-out infinite;
+}
+.mall-guide-label {
+  padding: 3px 9px;
+  border-radius: 14px;
+  background: #78362a;
+  color: white;
+  font-size: 12px;
+}
+@keyframes guide-bob {
+  0%, 100% { transform: translateY(0) rotate(0); }
+  50% { transform: translateY(-5px) rotate(3deg); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .mall-guide .ip-portrait { animation: none; }
+}
