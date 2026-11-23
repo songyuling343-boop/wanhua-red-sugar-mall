@@ -1,3 +1,4 @@
+import GuideModel from './components/GuideModel'
 import { lazy, Suspense, useEffect } from 'react'
 import { Route, Routes, useLocation } from 'react-router-dom'
 import { X } from 'lucide-react'
@@ -33,7 +34,7 @@ export default function App(){
   const isActivity=pathname==='/activity/quiz'||pathname==='/activity/blindbox'
   return <div className={`phone-shell ${isActivity?'on-activity':pathname.startsWith('/product/')?'on-detail':''}`}><ScrollToTop/><ExternalActivityTracker/><Suspense fallback={<div className="route-loading" role="status">万巧巧正在准备这份甜…</div>}><Routes><Route path="/activity/quiz" element={<Activity type="quiz"/>}/><Route path="/activity/blindbox" element={<Activity type="blindbox"/>}/><Route path="/story" element={<BrandStory/>}/><Route path="/guide" element={<DemoGuide/>}/><Route path="/" element={<Home/>}/><Route path="/category" element={<Category/>}/><Route path="/product/:id" element={<ProductDetail/>}/><Route path="/cart" element={<Cart/>}/><Route path="/member" element={<Member/>}/><Route path="/member/points" element={<Points/>}/><Route path="/member/sign" element={<SignIn/>}/><Route path="/member/coupons" element={<Coupons/>}/><Route path="/member/favorites" element={<Favorites/>}/><Route path="/member/activities" element={<Activities/>}/><Route path="/member/blindbox" element={<Blindbox/>}/><Route path="/member/benefits" element={<Benefits/>}/><Route path="/member/demo" element={<DemoSettings/>}/><Route path="/checkout/:checkoutId" element={<Checkout/>}/><Route path="/payment/:checkoutId" element={<Payment/>}/><Route path="/payment-success/:orderId" element={<PaymentSuccess/>}/><Route path="/orders" element={<Orders/>}/><Route path="/orders/:orderId" element={<OrderDetail/>}/><Route path="*" element={<><Header/><EmptyState title="走进了一条甜蜜小巷" text="回到首页，继续发现巧家的甜。" action="回到首页" to="/"/></>}/></Routes></Suspense>{!isActivity&&<BottomNav/>}{(pathname==='/' || pathname==='/category' || pathname.startsWith('/product/')) && (
     <a className="mall-guide" href="https://wanqiaoqiao-agent.pages.dev/" aria-label="问问万巧巧，进入智能咨询">
-      <IpPortrait/><span className="mall-guide-label">问问万巧巧</span>
+      <GuideModel/><span className="mall-guide-label">问问万巧巧</span>
     </a>
   )}<WelcomeModal/><MemberReward/><Toast/></div>
 }
