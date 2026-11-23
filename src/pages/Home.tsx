@@ -1,3 +1,4 @@
+import { homePoses } from '../data/homePoses'
 import ActivityLink from '../components/ActivityLink'
 import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
@@ -5,8 +6,8 @@ import { ArrowRight, ArrowUpRight, ChevronLeft, ChevronRight, Gift, Leaf, Sparkl
 import { brands, culture, site } from '../data/site'
 import { homeSections, newArrivals, products } from '../data/products'
 import { useMember } from '../context/MemberContext'
-import { IpSprite, QuizRewardCard } from '../components/MemberUI'
-import { Header, IpPortrait, PriceNotice, ProductCard, SectionTitle } from '../components/ShopUI'
+import { QuizRewardCard } from '../components/MemberUI'
+import { Header, PriceNotice, ProductCard, SectionTitle } from '../components/ShopUI'
 const slides = [
   { eyebrow:'FROM QIAOJIA, WITH LOVE',title:<>甜从巧家来<br/>好糖慢慢熬</>,description:'一碗蔗香，一份来自云南的心意。',action:'遇见巧家的甜',className:'culture-slide',to:'/story',image:'/images/qiaojia-gift.jpeg' },
   { eyebrow:'FIND YOUR SWEET SIDE',title:<>测测你的红糖属性</>,description:'看看你是哪一种甜',action:'立即测试',className:'quiz-slide',href:site.links.quiz },
@@ -18,16 +19,16 @@ function Banner() {
   const slide=slides[index]; const change=(amount:number)=>setIndex(i=>(i+amount+slides.length)%slides.length)
   return <section className={`hero-banner ${slide.className}`} aria-label="商城活动轮播" aria-roledescription="轮播" onMouseEnter={()=>setPaused(true)} onMouseLeave={()=>setPaused(false)} onFocusCapture={()=>setPaused(true)} onBlurCapture={e=>{if(!e.currentTarget.contains(e.relatedTarget))setPaused(false)}} onTouchStart={e=>setTouch(e.touches[0].clientX)} onTouchEnd={e=>{if(touch!==null && Math.abs(e.changedTouches[0].clientX-touch)>40)change(e.changedTouches[0].clientX<touch?1:-1);setTouch(null)}}>
     <div className="hero-copy" key={index}><span className="eyebrow">{slide.eyebrow}</span><h1>{slide.title}</h1><p>{slide.description}</p>{slide.to ? <Link className="hero-link" to={slide.to}>{slide.action}<ArrowRight size={15}/></Link> : <ActivityLink className="hero-link" to={slide.href!} title={site.activityNotice}>{slide.action}<ArrowUpRight size={15}/></ActivityLink>}</div>
-    {slide.image ? <div className="hero-product"><img src={slide.image} alt="遇见巧家伴手礼企业产品展示图"/><span>巧家风物 · 一份心意</span></div> : <IpPortrait className="hero-ip"/>}<span className="hero-watermark">甜</span>
+    {slide.image ? <div className="hero-product"><img src={slide.image} alt="遇见巧家伴手礼企业产品展示图"/><span>巧家风物 · 一份心意</span></div> : <img alt="" src={index === 1 ? homePoses.scroll : homePoses.drink} style={{position:"absolute",right:"4%",bottom:43,width:"34%",height:"58%",objectFit:"contain",zIndex:1}}/>}<span className="hero-watermark">甜</span>
     <div className="slider-controls"><button aria-label="上一张 Banner" onClick={()=>change(-1)}><ChevronLeft size={14}/></button><div className="slider-dots">{slides.map((s,i)=><button key={s.className} className={index===i?'selected':''} onClick={()=>setIndex(i)} aria-label={`切换到第${i+1}张 Banner`} aria-pressed={index===i}/>)}</div><span className="slide-count">0{index+1} / 03</span><button aria-label="下一张 Banner" onClick={()=>change(1)}><ChevronRight size={14}/></button></div>
   </section>
 }
 export default function Home() {
   const {state:member}=useMember()
   return <><Header/><main className="home-page"><div className="home-intro"><span><i/> 云南巧家 · 蔗香日常</span><span>让每一天，都有一点甜</span></div>
-    <div className="home-welcome"><span className="eyebrow">LET THE TRADITION FEEL YOUNG</span><h1>让传统红糖，<br/>也有年轻表达。</h1><p>今天也要甜甜的呀！</p><IpSprite pose="main" className="home-welcome-ip"/><span className="home-welcome-seal">巧家<br/>来甜</span></div>
+    <div className="home-welcome"><span className="eyebrow">LET THE TRADITION FEEL YOUNG</span><h1>让传统红糖，<br/>也有年轻表达。</h1><p>今天也要甜甜的呀！</p><img alt="" src={homePoses.welcome} style={{position:"absolute",right:"4%",bottom:10,width:"32%",height:"70%",objectFit:"contain"}}/><span className="home-welcome-seal">巧家<br/>来甜</span></div>
     <Banner/><p className="external-activity-note">{site.activityNotice}</p>
-    <div className="welcome-strip"><IpPortrait/><div><strong>今天也要甜甜的呀！</strong><p>万巧巧陪你挑一份属于自己的甜。</p></div><Sparkles size={19}/></div>
+    <div className="welcome-strip"><img alt="" src={homePoses.tray} style={{width:58,height:58,objectFit:"contain",flexShrink:0}}/><div><strong>今天也要甜甜的呀！</strong><p>万巧巧陪你挑一份属于自己的甜。</p></div><Sparkles size={19}/></div>
     {member.quizVisited&&!member.quizRewardClaimed&&<QuizRewardCard/>}
     <section className="brand-section"><SectionTitle title="四种相遇，一样甜蜜" english="CHOOSE YOUR SWEET"/><div className="brand-grid">{brands.map((brand,i)=><Link key={brand.id} to={`/category?brand=${brand.id}`} className={`brand-card ${brand.className}`}><span className="brand-number">0{i+1}</span><span className="brand-symbol">{i===0?'韵':i===1?'甜':'呵'}</span><strong>{brand.name}</strong><small>{brand.english}</small><p>{brand.description}</p><ArrowUpRight size={17}/></Link>)}<ActivityLink to={site.links.blindbox} title={site.activityNotice} className="brand-card blindbox"><span className="brand-number">04</span><Gift className="brand-gift" size={38}/><strong>万巧巧盲盒系列</strong><small>WAN QIAOQIAO CLUB</small><p>打开一盒，收获一份惊喜</p><ArrowUpRight size={17}/></ActivityLink></div><p className="subtle-note">万巧巧盲盒为 IP 互动衍生系列</p></section>
     <section className="home-products"><SectionTitle {...homeSections[0]} to="/category"/><PriceNotice/><div className="product-grid">{products.filter(p=>p.groups.includes('recommend')).slice(0,4).map(p=><ProductCard product={p} key={p.id}/>)}</div></section>
